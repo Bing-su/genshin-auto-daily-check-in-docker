@@ -11,8 +11,6 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
-LANG = "ko-kr"
-
 message = """
 ##############################
   {day}일 출석체크 성공!
@@ -20,10 +18,14 @@ message = """
 ##############################"""
 
 
-def main(ltuid: str, ltoken: str, lang: str = "ko-kr"):
-    gs.set_cookie(ltuid=ltuid, ltoken=ltoken)
+def main():
+    LTUID = os.getenv("LTUID", "")
+    LTOKEN = os.getenv("LTOKEN", "")
+    LANG = os.getenv("LANG", "ko-kr")
+    gs.set_cookie(ltuid=LTUID, ltoken=LTOKEN)
+
     try:
-        reward = gs.claim_daily_reward(lang=lang)
+        reward = gs.claim_daily_reward(lang=LANG)
     except gs.errors.NotLoggedIn:
         logging.error("쿠키 정보가 올바르지 않습니다. ltuid와 ltoken을 다시 확인해주세요.")
         return
@@ -37,7 +39,11 @@ def main(ltuid: str, ltoken: str, lang: str = "ko-kr"):
         logging.info(f"{day}일차는 이미 출석체크를 했습니다.")
 
 
+schedule.every().day.at("01:00").do(main)
+
 if __name__ == "__main__":
-    LTUID = os.getenv("LTUID", "")
-    LTOKEN = os.getenv("LTOKEN", "")
-    main(LTUID, LTOKEN)
+    logging.info("앱이 시작되었습니다.")
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
