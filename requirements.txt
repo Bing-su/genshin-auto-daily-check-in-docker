@@ -1,2 +1,2 @@
 schedule
-genshinstats
+genshin
