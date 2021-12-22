@@ -39,7 +39,7 @@ async def get_daily_reward():
     client.set_cookies(ltuid=LTUID, ltoken=LTOKEN)
 
     try:
-        reward = await client.claim_daily_reward()
+        await client.claim_daily_reward(reward=False)
     except genshin.InvalidCookies:
         m = "쿠키 정보가 올바르지 않습니다. ltuid와 ltoken을 다시 확인해주세요."
         logging.error(m)
@@ -47,7 +47,10 @@ async def get_daily_reward():
         _, day = await client.get_reward_info()
         logging.info(f"{day}일차는 이미 출석체크를 했습니다.")
     else:
-        m = MESSAGE.format(day=reward.time, item=reward.name, count=reward.amount)
+        _, day = await client.get_reward_info()
+        rewards = await client.get_monthly_rewards()
+        reward = rewards[day - 1]
+        m = MESSAGE.format(day=day, item=reward.name, count=reward.amount)
         logging.info(m)
     finally:
         await client.close()
