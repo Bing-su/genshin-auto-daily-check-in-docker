@@ -19,16 +19,12 @@ MESSAGE = """
 ##############################"""
 
 
-async def get_daily_reward():
-    LTUID = os.getenv("LTUID", "")
-    LTOKEN = os.getenv("LTOKEN", "")
-    LANG = os.getenv("LANG", "ko-kr")
-
+async def get_daily_reward(ltuid: str, ltoken: str, lang: str = "ko-kr"):
     try:
-        client = genshin.GenshinClient(lang=LANG)
+        client = genshin.GenshinClient(lang=lang)
     except ValueError:
         m = (
-            f"'{LANG}'은 유효한 언어가 아닙니다. "
+            f"'{lang}': 유효한 지역이 아닙니다. "
             "zh-cn, zh-tw, de-de, en-us, es-es, fr-fr, "
             "id-id, ja-jp, ko-kr, pt-pt, ru-ru, th-th, vi-vn "
             "중의 하나여야 합니다."
@@ -36,7 +32,7 @@ async def get_daily_reward():
         logging.error(m)
         return
 
-    client.set_cookies(ltuid=LTUID, ltoken=LTOKEN)
+    client.set_cookies(ltuid=ltuid, ltoken=ltoken)
 
     try:
         await client.claim_daily_reward(reward=False)
@@ -57,7 +53,10 @@ async def get_daily_reward():
 
 
 def main():
-    asyncio.run(get_daily_reward())
+    LTUID = os.getenv("LTUID", "")
+    LTOKEN = os.getenv("LTOKEN", "")
+    SERVER = os.getenv("SERVER", "ko-kr")
+    asyncio.run(get_daily_reward(LTUID, LTOKEN, SERVER))
 
 
 TIME = os.getenv("TIME", "01:00")
@@ -68,9 +67,8 @@ except schedule.ScheduleValueError:
     logging.error(m)
     raise SystemExit
 
-if __name__ == "__main__":
-    logging.info("앱이 실행되었습니다.")
+logging.info("앱이 실행되었습니다.")
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+while True:
+    schedule.run_pending()
+    time.sleep(1)
