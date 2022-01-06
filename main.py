@@ -1,4 +1,5 @@
 import asyncio
+import argparse
 import os
 import time
 from datetime import datetime
@@ -29,7 +30,13 @@ def check_server(server: str) -> str:
     }
 
     if server not in valid:
-        console.log(f"'{server}': 유효한 서버가 아닙니다. 'ko-kr'을 사용합니다.")
+        console.log(
+            f"'{server}': 유효한 서버가 아닙니다. "
+            '"zh-cn", "zh-tw", "de-de", "en-us", "es-es", '
+            '"fr-fr", "id-id", "ja-jp", "ko-kr", "pt-pt", '
+            '"ru-ru", "th-th", "vi-vn" 중의 하나여야 합니다.'
+            "'ko-kr'을 사용합니다."
+        )
         server = "ko-kr"
     return server
 
@@ -85,7 +92,7 @@ async def get_daily_reward(ltuid: str, ltoken: str, lang: str = "ko-kr", i: int 
     return info
 
 
-async def get_all_info(
+async def get_all_reward(
     ltuids: list[str], ltokens: list[str], server: str
 ) -> tuple[dict[str, str]]:
 
@@ -114,6 +121,13 @@ def init_table() -> Table:
     return table
 
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-o", "--once", action="store_true", help="Run only once")
+    args = parser.parse_args()
+    return args
+
+
 def main():
     LTUID = os.getenv("LTUID", "")
     LTOKEN = os.getenv("LTOKEN", "")
@@ -123,7 +137,7 @@ def main():
 
     SERVER = os.getenv("SERVER", "ko-kr")
     SERVER = check_server(SERVER)
-    results = asyncio.run(get_all_info(ltuids, ltokens, SERVER))
+    results = asyncio.run(get_all_reward(ltuids, ltokens, SERVER))
 
     table = init_table()
 
@@ -141,18 +155,31 @@ def main():
     console.print(table)
 
 
-TIME = os.getenv("TIME", "01:00")
-try:
-    schedule.every().day.at(TIME).do(main)
-except schedule.ScheduleValueError:
-    m = f"'{TIME}'은 잘못된 시간 형식입니다. TIME을 HH:MM(:SS)형태로 입력해주십시오."
-    console.log(m)
-    console.log("앱이 종료되었습니다.")
-    raise SystemExit
+if __name__ == "__main__":
+    args = parse_args()
+    if args.once:
+        try:
+            from dotenv import load_dotenv
 
-console.log("앱이 실행되었습니다.")
+            load_dotenv()
+        except ModuleNotFoundError:
+            console.log("python-dotenv 설치가 필요합니다.")
+        else:
+            main()
+        finally:
+            raise SystemExit
 
+    TIME = os.getenv("TIME", "01:00")
+    try:
+        schedule.every().day.at(TIME).do(main)
+    except schedule.ScheduleValueError:
+        m = f"'{TIME}'은 잘못된 시간 형식입니다. TIME을 HH:MM(:SS)형태로 입력해주십시오."
+        console.log(m)
+        console.log("앱이 종료되었습니다.")
+        raise SystemExit
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+    console.log("앱이 실행되었습니다.")
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
