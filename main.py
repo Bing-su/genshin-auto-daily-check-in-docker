@@ -32,9 +32,9 @@ def check_server(server: str) -> str:
     if server not in valid:
         console.log(
             f"'{server}': 유효한 서버가 아닙니다. "
-            '"zh-cn", "zh-tw", "de-de", "en-us", "es-es", '
-            '"fr-fr", "id-id", "ja-jp", "ko-kr", "pt-pt", '
-            '"ru-ru", "th-th", "vi-vn" 중의 하나여야 합니다.'
+            "'zh-cn', 'zh-tw', 'de-de', 'en-us', 'es-es', "
+            "'fr-fr', 'id-id', 'ja-jp', 'ko-kr', 'pt-pt', "
+            "'ru-ru', 'th-th', 'vi-vn' 중의 하나여야 합니다. "
             "'ko-kr'을 사용합니다."
         )
         server = "ko-kr"
@@ -47,7 +47,9 @@ def censor_uid(uid: int) -> str:
     return uid
 
 
-async def get_daily_reward(ltuid: str, ltoken: str, lang: str = "ko-kr", i: int = 1):
+async def get_daily_reward(
+    ltuid: str, ltoken: str, lang: str = "ko-kr", env_name: str = ""
+) -> dict[str, str]:
     client = genshin.GenshinClient(lang=lang)
     client.set_cookies(ltuid=ltuid, ltoken=ltoken)
 
@@ -64,7 +66,7 @@ async def get_daily_reward(ltuid: str, ltoken: str, lang: str = "ko-kr", i: int 
     try:
         await client.claim_daily_reward(reward=False)
     except genshin.InvalidCookies:
-        console.log(f"{i}번 계정: 쿠키 정보가 잘못되었습니다. ltuid와 ltoken을 확인해주세요.")
+        console.log(f"{env_name}: 쿠키 정보가 잘못되었습니다. ltuid와 ltoken을 확인해주세요.")
         await client.close()
         return info
     except genshin.AlreadyClaimed:
@@ -93,12 +95,12 @@ async def get_daily_reward(ltuid: str, ltoken: str, lang: str = "ko-kr", i: int 
 
 
 async def get_all_reward(
-    ltuids: list[str], ltokens: list[str], server: str
+    info: list[tuple[str, str, str]], server: str
 ) -> tuple[dict[str, str]]:
 
     funcs = (
-        get_daily_reward(ltuid, ltoken, server, i)
-        for i, (ltuid, ltoken) in enumerate(zip(ltuids, ltokens), 1)
+        get_daily_reward(ltuid, ltoken, server, env_name)
+        for env_name, ltuid, ltoken in info
     )
 
     results = await asyncio.gather(*funcs)
@@ -121,7 +123,17 @@ def init_table() -> Table:
     return table
 
 
-def parse_args():
+def get_cookie_info_in_env() -> list[tuple[str, str, str]]:
+    info = []
+    for name, value in os.environ.items():
+        if name.startswith("ACCOUNT"):
+            ltuid, ltoken = map(str.strip, value.split(","))
+            info.append((name, ltuid, ltoken))
+    info.sort()
+    return info
+
+
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--once", action="store_true", help="Run only once")
     args = parser.parse_args()
@@ -129,15 +141,11 @@ def parse_args():
 
 
 def main():
-    LTUID = os.getenv("LTUID", "")
-    LTOKEN = os.getenv("LTOKEN", "")
-
-    ltuids = list(map(str.strip, LTUID.split(",")))
-    ltokens = list(map(str.strip, LTOKEN.split(",")))
+    cookies = get_cookie_info_in_env()
 
     SERVER = os.getenv("SERVER", "ko-kr")
     SERVER = check_server(SERVER)
-    results = asyncio.run(get_all_reward(ltuids, ltokens, SERVER))
+    results = asyncio.run(get_all_reward(cookies, SERVER))
 
     table = init_table()
 
