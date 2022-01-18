@@ -22,7 +22,7 @@
 docker run -d
     -e ACCOUNT1=13435465,AbCdEFGhIjKLmnoPQRsTUvWxYZ
     -e ACCOUNT2=32132132,PQRsTUvWxYZAbCdEFGhIjKLmno
-    {imagename}
+    ks2515/genshin-auto-daily-check-in
 ```
 
 `ACCOUNT`로 시작하는 모든 환경변수를 인식합니다.
