@@ -171,11 +171,10 @@ if __name__ == "__main__":
 
             load_dotenv()
         except ModuleNotFoundError:
-            console.log("python-dotenv 설치가 필요합니다.")
-        else:
-            main()
-        finally:
-            raise SystemExit
+            pass
+
+        main()
+        raise SystemExit
 
     TIME = os.getenv("TIME", "01:00")
     try:
