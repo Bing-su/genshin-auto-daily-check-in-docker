@@ -1,10 +1,14 @@
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 ENV TZ="Asia/Seoul"
 
-COPY requirements.txt .
+WORKDIR /app
 
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml poetry.lock /app/
+
+RUN pip install --no-cache-dir poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-dev
 
 COPY . .
 

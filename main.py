@@ -1,11 +1,13 @@
-import asyncio
 import argparse
+import asyncio
 import os
+import sys
 import time
 from datetime import datetime
 
 import genshin
 import schedule
+from genshin.types import Game
 from rich.console import Console
 from rich.table import Table
 
@@ -29,6 +31,7 @@ def check_server(server: str) -> str:
         "vi-vn",
     }
 
+    server = server.lower()
     if server not in valid:
         console.log(
             f"'{server}': 유효한 서버가 아닙니다. "
@@ -50,7 +53,7 @@ def censor_uid(uid: int) -> str:
 async def get_daily_reward(
     ltuid: str, ltoken: str, lang: str = "ko-kr", env_name: str = ""
 ) -> dict[str, str]:
-    client = genshin.GenshinClient(lang=lang)
+    client = genshin.Client(lang=lang, game=Game.GENSHIN)
     client.set_cookies(ltuid=ltuid, ltoken=ltoken)
 
     info = dict(
@@ -67,17 +70,18 @@ async def get_daily_reward(
         await client.claim_daily_reward(reward=False)
     except genshin.InvalidCookies:
         console.log(f"{env_name}: 쿠키 정보가 잘못되었습니다. ltuid와 ltoken을 확인해주세요.")
-        await client.close()
         return info
     except genshin.AlreadyClaimed:
         info["status"] = "🟡 이미 했음"
     else:
         info["status"] = "✅ 출석 성공"
 
-    accounts = await client.genshin_accounts()
+    accounts = await client.get_game_accounts()
 
-    # 계정에서 가장 레벨이 높은 계정 정보만 사용
-    account = max((acc for acc in accounts), key=lambda a: a.level)
+    # 원신 계정에서 가장 레벨이 높은 지역의 계정 정보만 사용
+    account = max(
+        (acc for acc in accounts if acc.game == Game.GENSHIN), key=lambda acc: acc.level
+    )
     _, day = await client.get_reward_info()
     rewards = await client.get_monthly_rewards()
     reward = rewards[day - 1]
@@ -85,11 +89,9 @@ async def get_daily_reward(
     info["uid"] = censor_uid(account.uid)
     info["level"] = str(account.level)
     info["name"] = account.nickname
-    info["server"] = account.server_name.split()[0]
+    info["server"] = account.server_name.rsplit(maxsplit=1)[0]
     info["check_in_count"] = str(day)
     info["reward"] = f"{reward.name} x{reward.amount}"
-
-    await client.close()
 
     return info
 
@@ -140,6 +142,16 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
+def check_asyncio_windows_bug() -> None:
+    "https://github.com/encode/httpx/issues/914#issuecomment-622586610"
+    if (
+        sys.version_info[0] == 3
+        and sys.version_info[1] >= 8
+        and sys.platform.startswith("win")
+    ):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+
 def main():
     cookies = get_cookie_info_in_env()
 
@@ -164,6 +176,7 @@ def main():
 
 
 if __name__ == "__main__":
+    check_asyncio_windows_bug()
     args = parse_args()
     if args.once:
         try:
