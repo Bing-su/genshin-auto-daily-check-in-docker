@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "genshin-auto-daily-check-docker"
+version = "1.0.0"
+description = "원신 호요랩 자동 출석체크 도커 이미지. 여러 계정을 한번에 등록할 수 있습니다."
+authors = ["Bingsu <ks2515@naver.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+genshin = ">=1.0.0"
+rich = "*"
+schedule = "*"
+
+[tool.poetry.dev-dependencies]
+black = ">=22.1.0"
+isort = "*"
+flake8 = "*"
+flake8-bugbear = "*"
+python-dotenv = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
