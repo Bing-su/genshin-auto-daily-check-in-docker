@@ -8,8 +8,7 @@ COPY pyproject.toml poetry.lock /app/
 
 RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --no-dev && \
-    yes | poetry cache clear . --all
+    poetry install --no-dev
 
 COPY . .
 
