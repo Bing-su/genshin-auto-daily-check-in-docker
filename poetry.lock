@@ -152,7 +152,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "genshin"
-version = "1.0.0"
+version = "1.0.1"
 description = "An API wrapper for Genshin Impact."
 category = "main"
 optional = false
@@ -539,8 +539,8 @@ frozenlist = [
     {file = "frozenlist-1.3.0.tar.gz", hash = "sha256:ce6f2ba0edb7b0c1d8976565298ad2deba6f8064d2bebb6ffce2ca896eb35b0b"},
 ]
 genshin = [
-    {file = "genshin-1.0.0-py3-none-any.whl", hash = "sha256:38fb700d427170ce996984862ac85a3ed41595953b42e31512bbd10e4a6f766f"},
-    {file = "genshin-1.0.0.tar.gz", hash = "sha256:f45a40212348ec7ae01898e9657151ea70cfb0a3f8bdfced81d36481f2cc0a74"},
+    {file = "genshin-1.0.1-py3-none-any.whl", hash = "sha256:f87ab5ddb38b0d1ec8c4433634f1161d53213e4fe1e650ad9026c950a22b3472"},
+    {file = "genshin-1.0.1.tar.gz", hash = "sha256:7b4892d69ebf5c5562822a71a7d89d3dce56452538675c39a841a5c4eb6b33f7"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
