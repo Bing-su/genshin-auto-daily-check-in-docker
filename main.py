@@ -129,8 +129,8 @@ def init_table() -> Table:
 def get_cookie_info_in_env() -> list[tuple[str, str, str]]:
     info = []
     for name, value in os.environ.items():
-        if name.startswith("ACCOUNT"):
-            ltuid, ltoken = map(str.strip, value.split(","))
+        if name.startswith("ACCOUNT") and "," in value:
+            ltuid, ltoken = map(str.strip, value.split(",", maxsplit=1))
             info.append((name, ltuid, ltoken))
     info.sort()
     return info
