@@ -53,6 +53,7 @@ def censor_uid(uid: int) -> str:
 async def get_daily_reward(
     ltuid: str, ltoken: str, lang: str = "ko-kr", env_name: str = ""
 ) -> dict[str, str]:
+
     client = genshin.Client(lang=lang, game=Game.GENSHIN)
     client.set_cookies(ltuid=ltuid, ltoken=ltoken)
 
@@ -142,7 +143,7 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
-def check_asyncio_windows_bug() -> None:
+def solve_asyncio_windows_error() -> None:
     "https://github.com/encode/httpx/issues/914#issuecomment-622586610"
     if (
         sys.version_info[0] == 3
@@ -152,7 +153,7 @@ def check_asyncio_windows_bug() -> None:
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
-def main():
+def main() -> None:
     cookies = get_cookie_info_in_env()
 
     SERVER = os.getenv("SERVER", "ko-kr")
@@ -176,7 +177,7 @@ def main():
 
 
 if __name__ == "__main__":
-    check_asyncio_windows_bug()
+    solve_asyncio_windows_error()
     args = parse_args()
     if args.once:
         try:
