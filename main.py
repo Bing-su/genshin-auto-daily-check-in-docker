@@ -7,7 +7,7 @@ from datetime import datetime
 
 import genshin
 import schedule
-from genshin.types import Game
+from genshin import Game
 from rich.console import Console
 from rich.table import Table
 
