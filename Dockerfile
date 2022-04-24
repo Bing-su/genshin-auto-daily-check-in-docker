@@ -6,9 +6,9 @@ WORKDIR /app
 
 COPY pyproject.toml poetry.lock /app/
 
-RUN pip install --no-cache-dir poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install --no-dev
+RUN pip install micropipenv[toml] && \
+    micropipenv install --deploy && \
+    pip cache purge
 
 COPY . .
 
