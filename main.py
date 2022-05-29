@@ -112,8 +112,8 @@ async def get_all_reward(
 
 
 def init_table() -> Table:
-    today = datetime.strftime(datetime.now(), "%Y-%m-%d %I:%M:%S %p")
-    table = Table(title=today, title_style="bold", header_style="bold")
+    now = datetime.strftime(datetime.now(), "%Y-%m-%d %I:%M:%S %p")
+    table = Table(title=now, title_style="bold", header_style="bold")
 
     table.add_column("UID", justify="center", style="dim")
     table.add_column("이름", justify="center")
@@ -156,9 +156,9 @@ def solve_asyncio_windows_error() -> None:
 def main() -> None:
     cookies = get_cookie_info_in_env()
 
-    SERVER = os.getenv("SERVER", "ko-kr")
-    SERVER = check_server(SERVER)
-    results = asyncio.run(get_all_reward(cookies, SERVER))
+    server = os.getenv("SERVER", "ko-kr")
+    server = check_server(server)
+    results = asyncio.run(get_all_reward(cookies, server))
 
     table = init_table()
 
@@ -179,16 +179,17 @@ def main() -> None:
 if __name__ == "__main__":
     solve_asyncio_windows_error()
     args = parse_args()
+
+    try:
+        from dotenv import load_dotenv
+
+        load_dotenv()
+    except ModuleNotFoundError:
+        pass
+
     if args.once:
-        try:
-            from dotenv import load_dotenv
-
-            load_dotenv()
-        except ModuleNotFoundError:
-            pass
-
         main()
-        raise SystemExit
+        sys.exit()
 
     TIME = os.getenv("TIME", "01:00")
     try:
@@ -197,7 +198,7 @@ if __name__ == "__main__":
         m = f"'{TIME}'은 잘못된 시간 형식입니다. TIME을 HH:MM(:SS)형태로 입력해주십시오."
         console.log(m)
         console.log("앱이 종료되었습니다.")
-        raise SystemExit
+        sys.exit(1)
 
     console.log("앱이 실행되었습니다.")
 
