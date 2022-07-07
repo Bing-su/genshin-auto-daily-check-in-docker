@@ -1,4 +1,6 @@
 __pycache__
+.mypy_cache
 .git
+.github
 .env
 .vscode
