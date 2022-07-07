@@ -51,7 +51,7 @@ main.py에 -o를 붙여 실행하면 매일 반복하는 것이 아니라 한 �
 
 ## 요구사항
 
-python>=3.9
-schedule
-[genshin](https://github.com/thesadru/genshin.py)
+python>=3.9<br>
+schedule<br>
+[genshin](https://github.com/thesadru/genshin.py)<br>
 rich
