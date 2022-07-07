@@ -1,6 +1,8 @@
-# genshin-auto-daily-check-docker
+# genshin-auto-daily-check-in-docker
 
 원신 호요랩 자동 출석체크 도커 이미지. 여러 계정을 한번에 등록할 수 있습니다.
+
+[Github](https://github.com/Bing-su/genshin-auto-daily-check-in-docker)
 
 ## 사용법
 
@@ -48,6 +50,13 @@ python main.py -o
 ```
 
 main.py에 -o를 붙여 실행하면 매일 반복하는 것이 아니라 한 번만 실행합니다.
+
+### 빌드
+
+```sh
+docker buildx build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in --push .
+```
+
 
 ## 요구사항
 
