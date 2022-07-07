@@ -18,6 +18,8 @@
 
 ### 2. 도커 이미지 사용하기
 
+해당 토큰은 예시입니다.
+
 ```bash
 docker run -d
     -e ACCOUNT1=13435465,AbCdEFGhIjKLmnoPQRsTUvWxYZ
@@ -49,7 +51,7 @@ main.py에 -o를 붙여 실행하면 매일 반복하는 것이 아니라 한 �
 
 ## 요구사항
 
-python>=3.9  
-schedule  
-[genshin](https://github.com/thesadru/genshin.py)  
+python>=3.9
+schedule
+[genshin](https://github.com/thesadru/genshin.py)
 rich
