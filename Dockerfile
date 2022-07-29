@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-ENV TZ="Asia/Seoul"
+ENV TZ="Asia/Shanghai"
 
 WORKDIR /app
 

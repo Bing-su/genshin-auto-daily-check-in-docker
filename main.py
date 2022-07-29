@@ -191,7 +191,7 @@ if __name__ == "__main__":
         main()
         sys.exit()
 
-    TIME = os.getenv("TIME", "01:00")
+    TIME = os.getenv("TIME", "00:00")
     try:
         schedule.every().day.at(TIME).do(main)
     except schedule.ScheduleValueError:
