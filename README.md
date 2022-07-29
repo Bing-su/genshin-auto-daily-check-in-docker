@@ -42,7 +42,7 @@ docker run -d
 | ACCOUNT~    | 쿠키 정보입니다.                                                                                | 13435465,AbCdEFGhIjKLmnoPQRsTUvWxYZ |
 | SERVER      | 사용할 언어 정보입니다. 기본값 "ko-kr"                                                                | ko-kr                               |
 | TIME        | 매일 출석체크를 할 시간입니다. CST(UTC+8) 기준입니다. 기본값 "00:00"<br/>출석체크 기준 시각은 한국시간 오전 1시입니다. (중국시간 0시) | 00:00                               |
-| TZ          | 도커 컨테이너가 사용할 시간대입니다. <br/>출석체크 기준 시각에 맞춰 기본값은 Asia/Shanghai입니다.                          |                                     |
+| TZ          | 도커 컨테이너가 사용할 시간대입니다. <br/>출석체크 기준 시각에 맞춰 기본값은 Asia/Shanghai입니다.                          | Asia/Shanghai                       |
 
 ### 3. 기타
 
@@ -52,9 +52,9 @@ python main.py -o
 
 main.py에 -o를 붙여 실행하면 매일 반복하는 것이 아니라 한 번만 실행합니다.
 
-### 빌드
+#### 빌드
 
-```sh
+```bash
 docker buildx build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in --push .
 ```
 
