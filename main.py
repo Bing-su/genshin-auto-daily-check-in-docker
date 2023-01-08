@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import argparse
 import asyncio
 import os
 import sys
 import time
+from dataclasses import dataclass
 from datetime import datetime
 
 import genshin
@@ -12,6 +15,24 @@ from rich.console import Console
 from rich.table import Table
 
 console = Console()
+
+
+@dataclass
+class CookieInfo:
+    ltuid: str
+    ltoken: str
+    env_name: str = ""
+
+
+@dataclass
+class RewardInfo:
+    uid: str = "❓"
+    level: str = "❓"
+    name: str = "❓"
+    server: str = "❓"
+    status: str = "❌ 실패"
+    check_in_count: str = "❓"
+    reward: str = "❓"
 
 
 def check_server(server: str) -> str:
@@ -50,64 +71,52 @@ def censor_uid(uid: int) -> str:
     return uid
 
 
-async def get_daily_reward(
-    ltuid: str, ltoken: str, lang: str = "ko-kr", env_name: str = ""
-) -> dict[str, str]:
+class GetDailyReward:
+    def __init__(self):
+        self.rewards = []
 
-    client = genshin.Client(lang=lang, game=Game.GENSHIN)
-    client.set_cookies(ltuid=ltuid, ltoken=ltoken)
+    async def __call__(self, cookie: CookieInfo, server: str) -> RewardInfo:
+        client = genshin.Client(lang=server, game=Game.GENSHIN)
+        client.set_cookies(ltuid=cookie.ltuid, ltoken=cookie.ltoken)
 
-    info = dict(
-        uid="❓",
-        level="❓",
-        name="❓",
-        server="❓",
-        status="❌ 실패",
-        check_in_count="❓",
-        reward="❓",
-    )
+        info = RewardInfo()
 
-    try:
-        await client.claim_daily_reward(reward=False)
-    except genshin.InvalidCookies:
-        console.log(f"{env_name}: 쿠키 정보가 잘못되었습니다. ltuid와 ltoken을 확인해주세요.")
+        try:
+            await client.claim_daily_reward(reward=False)
+        except genshin.InvalidCookies:
+            console.log(f"{cookie.env_name}: 쿠키 정보가 잘못되었습니다. ltuid와 ltoken을 확인해주세요.")
+            return info
+        except genshin.AlreadyClaimed:
+            info.status = "🟡 이미 했음"
+        else:
+            info.status = "✅ 출석 성공"
+
+        accounts = await client.get_game_accounts()
+
+        # 원신 계정에서 가장 레벨이 높은 지역의 계정 정보만 사용
+        account = max(
+            (acc for acc in accounts if acc.game == Game.GENSHIN),
+            key=lambda acc: acc.level,
+        )
+        _, day = await client.get_reward_info()
+        if not self.rewards:
+            self.rewards = await client.get_monthly_rewards()
+        reward = self.rewards[day - 1]
+
+        info.uid = censor_uid(account.uid)
+        info.level = str(account.level)
+        info.name = account.nickname
+        info.server = account.server_name.rsplit(maxsplit=1)[0]
+        info.check_in_count = str(day)
+        info.reward = f"{reward.name} x{reward.amount}"
+
         return info
-    except genshin.AlreadyClaimed:
-        info["status"] = "🟡 이미 했음"
-    else:
-        info["status"] = "✅ 출석 성공"
-
-    accounts = await client.get_game_accounts()
-
-    # 원신 계정에서 가장 레벨이 높은 지역의 계정 정보만 사용
-    account = max(
-        (acc for acc in accounts if acc.game == Game.GENSHIN), key=lambda acc: acc.level
-    )
-    _, day = await client.get_reward_info()
-    rewards = await client.get_monthly_rewards()
-    reward = rewards[day - 1]
-
-    info["uid"] = censor_uid(account.uid)
-    info["level"] = str(account.level)
-    info["name"] = account.nickname
-    info["server"] = account.server_name.rsplit(maxsplit=1)[0]
-    info["check_in_count"] = str(day)
-    info["reward"] = f"{reward.name} x{reward.amount}"
-
-    return info
 
 
-async def get_all_reward(
-    info: list[tuple[str, str, str]], server: str
-) -> tuple[dict[str, str]]:
-
-    funcs = (
-        get_daily_reward(ltuid, ltoken, server, env_name)
-        for env_name, ltuid, ltoken in info
-    )
-
+async def get_all_reward(info: list[CookieInfo], server: str) -> list[RewardInfo]:
+    get_daily_reward = GetDailyReward()
+    funcs = (get_daily_reward(cookie=cookie, server=server) for cookie in info)
     results = await asyncio.gather(*funcs)
-
     return results
 
 
@@ -126,13 +135,14 @@ def init_table() -> Table:
     return table
 
 
-def get_cookie_info_in_env() -> list[tuple[str, str, str]]:
+def get_cookie_info_in_env() -> list[CookieInfo]:
     info = []
     for name, value in os.environ.items():
         if name.startswith("ACCOUNT") and "," in value:
             ltuid, ltoken = map(str.strip, value.split(",", maxsplit=1))
-            info.append((name, ltuid, ltoken))
-    info.sort()
+            cookie = CookieInfo(ltuid, ltoken, name)
+            info.append(cookie)
+    info.sort(key=lambda cookie: cookie.env_name)
     return info
 
 
@@ -143,7 +153,7 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
-def solve_asyncio_windows_error() -> None:
+def fix_asyncio_windows_error() -> None:
     "https://github.com/encode/httpx/issues/914#issuecomment-622586610"
     if (
         sys.version_info[0] == 3
@@ -164,27 +174,27 @@ def main() -> None:
 
     for info in results:
         table.add_row(
-            info["uid"],
-            info["name"],
-            info["level"],
-            info["server"],
-            info["check_in_count"],
-            info["status"],
-            info["reward"],
+            info.uid,
+            info.name,
+            info.level,
+            info.server,
+            info.check_in_count,
+            info.status,
+            info.reward,
         )
 
     console.print(table)
 
 
 if __name__ == "__main__":
-    solve_asyncio_windows_error()
+    fix_asyncio_windows_error()
     args = parse_args()
 
     try:
         from dotenv import load_dotenv
 
         load_dotenv()
-    except ModuleNotFoundError:
+    except Exception:
         pass
 
     if args.once:
