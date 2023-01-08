@@ -55,7 +55,11 @@ main.py에 -o를 붙여 실행하면 매일 반복하는 것이 아니라 한 �
 #### 빌드
 
 ```bash
+docker buildx create --name genshin-builder --use
+
 docker buildx build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in --push .
+
+docker buildx build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in:alpine -f Dockerfile-alpine --push .
 ```
 
 ## 요구사항
