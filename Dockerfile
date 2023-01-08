@@ -1,14 +1,12 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 ENV TZ="Asia/Shanghai"
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock /app/
+COPY requirements.txt /app
 
-RUN pip install micropipenv[toml] && \
-    micropipenv install --deploy && \
-    pip cache purge
+RUN pip install -U --no-cache-dir --require-hashes -r requirements.txt
 
 COPY . .
 
