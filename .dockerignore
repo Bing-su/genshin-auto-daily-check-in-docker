@@ -4,3 +4,4 @@ __pycache__
 .github
 .env
 .vscode
+.ruff_cache
