@@ -61,6 +61,6 @@ docker buildx build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto
 ## 요구사항
 
 python>=3.9<br>
-schedule<br>
+[schedule](https://github.com/dbader/schedule)<br>
 [genshin](https://github.com/thesadru/genshin.py)<br>
-rich
+[rich](https://github.com/Textualize/rich)
