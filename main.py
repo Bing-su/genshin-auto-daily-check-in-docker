@@ -65,7 +65,7 @@ def check_server(server: str) -> str:
     return server
 
 
-def censor_uid(uid: int) -> str:
+def censor_uid(uid: int | str) -> str:
     uid = str(uid)
     uid = uid[:2] + "■■■■■■" + uid[-1]
     return uid
@@ -88,6 +88,9 @@ class GetDailyReward:
             return info
         except genshin.AlreadyClaimed:
             info.status = "🟡 이미 했음"
+        except genshin.GenshinException as e:
+            console.log(f"{cookie.env_name}: {e}")
+            return info
         else:
             info.status = "✅ 출석 성공"
 
@@ -194,12 +197,12 @@ if __name__ == "__main__":
         from dotenv import load_dotenv
 
         load_dotenv()
-    except Exception:
+    except ImportError:
         pass
 
     if args.once:
         main()
-        sys.exit()
+        sys.exit(0)
 
     TIME = os.getenv("TIME", "00:00")
     try:
