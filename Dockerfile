@@ -1,4 +1,6 @@
-FROM python:3.11-slim
+FROM python:3.11-alpine
+
+RUN apk add --no-cache tzdata
 
 ENV TZ="Asia/Shanghai"
 
