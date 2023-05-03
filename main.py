@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import argparse
 import asyncio
 import os
@@ -35,6 +33,13 @@ class RewardInfo:
     reward: str = "❓"
 
 
+@dataclass
+class GameAndReward:
+    name: str
+    game: Game
+    rewards: list[RewardInfo]
+
+
 def check_server(server: str) -> str:
     valid = {
         "zh-cn",
@@ -65,6 +70,14 @@ def check_server(server: str) -> str:
     return server
 
 
+def is_true(value: str) -> bool:
+    return value.lower() in ("true", "1", "yes", "y", "on")
+
+
+def is_there_any_success(results: list[RewardInfo]) -> bool:
+    return any(result.status != "❌ 실패" for result in results)
+
+
 def censor_uid(uid: int | str) -> str:
     uid = str(uid)
     uid = uid[:2] + "■■■■■■" + uid[-1]
@@ -72,11 +85,12 @@ def censor_uid(uid: int | str) -> str:
 
 
 class GetDailyReward:
-    def __init__(self):
+    def __init__(self, game: Game = Game.GENSHIN):
         self.rewards = []
+        self.game = game
 
     async def __call__(self, cookie: CookieInfo, server: str) -> RewardInfo:
-        client = genshin.Client(lang=server, game=Game.GENSHIN)
+        client = genshin.Client(lang=server, game=self.game)
         client.set_cookies(ltuid=cookie.ltuid, ltoken=cookie.ltoken)
 
         info = RewardInfo()
@@ -89,7 +103,8 @@ class GetDailyReward:
         except genshin.AlreadyClaimed:
             info.status = "🟡 이미 했음"
         except genshin.GenshinException as e:
-            console.log(f"{cookie.env_name}: {e}")
+            if "No genshin account" not in str(e):
+                console.log(f"{cookie.env_name}: {e}")
             return info
         else:
             info.status = "✅ 출석 성공"
@@ -98,7 +113,7 @@ class GetDailyReward:
 
         # 원신 계정에서 가장 레벨이 높은 지역의 계정 정보만 사용
         account = max(
-            (acc for acc in accounts if acc.game == Game.GENSHIN),
+            (acc for acc in accounts if acc.game == self.game),
             key=lambda acc: acc.level,
         )
         _, day = await client.get_reward_info()
@@ -116,16 +131,33 @@ class GetDailyReward:
         return info
 
 
-async def get_all_reward(info: list[CookieInfo], server: str) -> list[RewardInfo]:
-    get_daily_reward = GetDailyReward()
-    funcs = (get_daily_reward(cookie=cookie, server=server) for cookie in info)
-    results = await asyncio.gather(*funcs)
-    return results
+async def get_all_reward(info: list[CookieInfo], server: str) -> list[GameAndReward]:
+    all_results = []
+
+    env_and_enum = [
+        ("NO_GENSHIN", Game.GENSHIN),
+        ("NO_STARRAIL", Game.STARRAIL),
+        ("NO_HONKAI", Game.HONKAI),
+    ]
+
+    for env, game in env_and_enum:
+        if is_true(os.getenv(env, "0")):
+            continue
+        get_daily_reward = GetDailyReward(game=game)
+        funcs = (get_daily_reward(cookie=cookie, server=server) for cookie in info)
+        results = await asyncio.gather(*funcs)
+
+        if is_there_any_success(results):
+            game_and_reward = GameAndReward(env.removeprefix("NO_"), game, results)
+            all_results.append(game_and_reward)
+
+    return all_results
 
 
-def init_table() -> Table:
+def init_table(name: str = "GENSHIN") -> Table:
     now = datetime.strftime(datetime.now(), "%Y-%m-%d %I:%M:%S %p")
-    table = Table(title=now, title_style="bold", header_style="bold")
+    title = f"🎮{name} 🕰️{now}"
+    table = Table(title=title, title_style="bold", header_style="bold", expand=True)
 
     table.add_column("UID", justify="center", style="dim")
     table.add_column("이름", justify="center")
@@ -152,8 +184,7 @@ def get_cookie_info_in_env() -> list[CookieInfo]:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--once", action="store_true", help="Run only once")
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def fix_asyncio_windows_error() -> None:
@@ -173,20 +204,24 @@ def main() -> None:
     server = check_server(server)
     results = asyncio.run(get_all_reward(cookies, server))
 
-    table = init_table()
+    if not results:
+        return
 
-    for info in results:
-        table.add_row(
-            info.uid,
-            info.name,
-            info.level,
-            info.server,
-            info.check_in_count,
-            info.status,
-            info.reward,
-        )
+    for result in results:
+        table = init_table(result.name)
 
-    console.print(table)
+        for info in result.rewards:
+            table.add_row(
+                info.uid,
+                info.name,
+                info.level,
+                info.server,
+                info.check_in_count,
+                info.status,
+                info.reward,
+            )
+
+        console.print(table)
 
 
 if __name__ == "__main__":
