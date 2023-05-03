@@ -43,6 +43,9 @@ docker run -d
 | SERVER      | 사용할 언어 정보입니다. 기본값 "ko-kr"                                                                | ko-kr                               |
 | TIME        | 매일 출석체크를 할 시간입니다. CST(UTC+8) 기준입니다. 기본값 "00:00"<br/>출석체크 기준 시각은 한국시간 오전 1시입니다. (중국시간 0시) | 00:00                               |
 | TZ          | 도커 컨테이너가 사용할 시간대입니다. <br/>출석체크 기준 시각에 맞춰 기본값은 Asia/Shanghai입니다.                          | Asia/Shanghai                       |
+| NO_GENSHIN  | 원신 출석체크를 하지 않습니다.                                                                        | true                                |
+| NO_STARRAIL | 스타레일 출석체크를 하지 않습니다.                                                                      | 1                                   |
+| NO_HONKAI   | 붕괴3rd 출석체크를 하지 않습니다.                                                                     | yes                                 |
 
 ### 3. 기타
 
@@ -58,13 +61,11 @@ main.py에 -o를 붙여 실행하면 매일 반복하는 것이 아니라 한 �
 docker buildx create --name genshin-builder --use
 
 docker buildx build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in --push .
-
-docker buildx build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in:alpine -f Dockerfile-alpine --push .
 ```
 
 ## 요구사항
 
-python>=3.9<br>
+python>=3.10<br>
 [schedule](https://github.com/dbader/schedule)<br>
 [genshin](https://github.com/thesadru/genshin.py)<br>
 [rich](https://github.com/Textualize/rich)
