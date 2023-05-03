@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-genshin = { git = "https://github.com/thesadru/genshin.py" }
+genshin = { url = "https://github.com/thesadru/genshin.py/archive/refs/heads/master.zip" }
 rich = "*"
 schedule = "*"
 

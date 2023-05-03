@@ -407,8 +407,9 @@ description = ""
 category = "main"
 optional = false
 python-versions = ">=3.8"
-files = []
-develop = false
+files = [
+    {file = "master.zip", hash = "sha256:4e244257a8f5a01262ba343391314565dbff3ababfc94455a3fdc0b049a6c36d"},
+]
 
 [package.dependencies]
 aiohttp = "*"
@@ -421,11 +422,8 @@ cookies = ["browser-cookie3"]
 geetest = ["rsa"]
 
 [package.source]
-type = "git"
-url = "https://github.com/thesadru/genshin.py"
-reference = "HEAD"
-resolved_reference = "263d2412caca302089b35ef4c5abb6184a384d91"
-
+type = "url"
+url = "https://github.com/thesadru/genshin.py/archive/refs/heads/master.zip"
 [[package]]
 name = "idna"
 version = "3.4"
@@ -932,4 +930,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "1f0d88d49345e25e5d65f75d79ab4cb7936bfdd54b77cc1772e865f322c7314c"
+content-hash = "f325c784a678f2fd43b0dce016e2aa204fd30433ef6f2413b9a422b295772d75"
