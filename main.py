@@ -9,7 +9,8 @@ from datetime import datetime
 import genshin
 import schedule
 from genshin import Game
-from rich.console import Console
+from rich.console import Console, Group
+from rich.panel import Panel
 from rich.table import Table
 
 console = Console()
@@ -155,8 +156,7 @@ async def get_all_reward(info: list[CookieInfo], server: str) -> list[GameAndRew
 
 
 def init_table(name: str = "GENSHIN") -> Table:
-    now = datetime.strftime(datetime.now(), "%Y-%m-%d %I:%M:%S %p")
-    title = f"🎮{name} 🕰️{now}"
+    title = f"🎮{name}"
     table = Table(title=title, title_style="bold", header_style="bold", expand=True)
 
     table.add_column("UID", justify="center", style="dim")
@@ -207,6 +207,9 @@ def main() -> None:
     if not results:
         return
 
+    now = datetime.strftime(datetime.now(), "%Y-%m-%d %I:%M:%S %p")
+    group = []
+
     for result in results:
         table = init_table(result.name)
 
@@ -221,7 +224,10 @@ def main() -> None:
                 info.reward,
             )
 
-        console.print(table)
+        group.append(table)
+
+    panel = Panel(Group(*group), title=now)
+    console.print(panel)
 
 
 if __name__ == "__main__":
