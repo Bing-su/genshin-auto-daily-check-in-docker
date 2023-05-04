@@ -32,6 +32,7 @@ class RewardInfo:
     status: str = "❌ 실패"
     check_in_count: str = "❓"
     reward: str = "❓"
+    success: bool = False
 
 
 @dataclass
@@ -76,12 +77,12 @@ def is_true(value: str) -> bool:
 
 
 def is_there_any_success(results: list[RewardInfo]) -> bool:
-    return any(result.status != "❌ 실패" for result in results)
+    return any(result.success for result in results)
 
 
 def censor_uid(uid: int | str) -> str:
     uid = str(uid)
-    uid = uid[:2] + "■■■■■■" + uid[-1]
+    uid = uid[:3] + "■■■■■" + uid[-1]
     return uid
 
 
@@ -128,6 +129,7 @@ class GetDailyReward:
         info.server = account.server_name.rsplit(maxsplit=1)[0]
         info.check_in_count = str(day)
         info.reward = f"{reward.name} x{reward.amount}"
+        info.success = True
 
         return info
 
