@@ -23,9 +23,11 @@
 해당 토큰은 예시입니다.
 
 ```bash
-docker run -d
-    -e ACCOUNT1=13435465,AbCdEFGhIjKLmnoPQRsTUvWxYZ
-    -e ACCOUNT2=32132132,PQRsTUvWxYZAbCdEFGhIjKLmno
+docker run -d \
+    --restart always \
+    -e ACCOUNT1=13435465,AbCdEFGhIjKLmnoPQRsTUvWxYZ \
+    -e ACCOUNT2=32132132,PQRsTUvWxYZAbCdEFGhIjKLmno \
+    -e NO_HONKAI=TRUE \
     ks2515/genshin-auto-daily-check-in
 ```
 
@@ -33,13 +35,13 @@ docker run -d
 
 `,`로 ltuid와 ltoken을 구분하여 입력해주어야 합니다.
 
-![예시 이미지](https://i.imgur.com/AJKfjrO.png)
+![예시 이미지](https://i.imgur.com/s8C8cJy.png)
 
 위 처럼 결과가 나옵니다.
 
 | 사용가능한 환경 변수 | 설명                                                                                       | 예시                                  |
 | ----------- | ---------------------------------------------------------------------------------------- | ----------------------------------- |
-| ACCOUNT~    | 쿠키 정보입니다.                                                                                | 13435465,AbCdEFGhIjKLmnoPQRsTUvWxYZ |
+| ACCOUNT*    | 쿠키 정보입니다.                                                                                | 13435465,AbCdEFGhIjKLmnoPQRsTUvWxYZ |
 | SERVER      | 사용할 언어 정보입니다. 기본값 "ko-kr"                                                                | ko-kr                               |
 | TIME        | 매일 출석체크를 할 시간입니다. CST(UTC+8) 기준입니다. 기본값 "00:00"<br/>출석체크 기준 시각은 한국시간 오전 1시입니다. (중국시간 0시) | 00:00                               |
 | TZ          | 도커 컨테이너가 사용할 시간대입니다. <br/>출석체크 기준 시각에 맞춰 기본값은 Asia/Shanghai입니다.                          | Asia/Shanghai                       |
