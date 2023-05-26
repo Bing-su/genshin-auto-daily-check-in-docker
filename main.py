@@ -105,7 +105,7 @@ class GetDailyReward:
         except genshin.AlreadyClaimed:
             info.status = "🟡 이미 했음"
         except genshin.GenshinException as e:
-            if "No genshin account" not in str(e):
+            if e.retcode != -10002:
                 console.log(f"{cookie.env_name}: {e}")
             return info
         else:
