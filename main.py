@@ -29,7 +29,7 @@ class RewardInfo:
     level: str = "❓"
     name: str = "❓"
     server: str = "❓"
-    status: str = "❌ 실패"
+    status: str = "❌"
     check_in_count: str = "❓"
     reward: str = "❓"
     success: bool = False
@@ -103,13 +103,13 @@ class GetDailyReward:
             console.log(f"{cookie.env_name}: 쿠키 정보가 잘못되었습니다. ltuid와 ltoken을 확인해주세요.")
             return info
         except genshin.AlreadyClaimed:
-            info.status = "🟡 이미 했음"
+            info.status = "🟡"
         except genshin.GenshinException as e:
             if e.retcode != -10002:
                 console.log(f"{cookie.env_name}: {e}")
             return info
         else:
-            info.status = "✅ 출석 성공"
+            info.status = "✅"
 
         accounts = await client.get_game_accounts()
 
@@ -165,9 +165,9 @@ def init_table(name: str = "GENSHIN") -> Table:
     table.add_column("이름", justify="center")
     table.add_column("레벨", justify="center")
     table.add_column("서버", justify="center")
-    table.add_column("출석 일수", justify="center")
-    table.add_column("출석 성공여부", justify="right")
-    table.add_column("출석 보상", justify="right", style="green")
+    table.add_column("출석일", justify="center")
+    table.add_column("성공", justify="right")
+    table.add_column("보상", justify="right", style="green")
 
     return table
 
