@@ -165,7 +165,7 @@ def init_table(name: str = "GENSHIN") -> Table:
     table.add_column("이름", justify="center")
     table.add_column("레벨", justify="center")
     table.add_column("서버", justify="center")
-    table.add_column("출석일", justify="center")
+    table.add_column("일수", justify="center")
     table.add_column("성공", justify="right")
     table.add_column("보상", justify="right", style="green")
 
