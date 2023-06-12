@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "genshin-auto-daily-check-in-docker"
-version = "1.3.1"
+version = "1.3.2"
 description = "원신 호요랩 자동 출석체크 도커 이미지. 여러 계정을 한번에 등록할 수 있습니다."
 authors = ["Bingsu <ks2515@naver.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-genshin = { url = "https://github.com/thesadru/genshin.py/archive/95d0649d13c02c51f6b7487c5eea2ae940fb50a4.zip" }
+genshin = "^1.6.0"
 rich = "*"
 schedule = "*"
 
