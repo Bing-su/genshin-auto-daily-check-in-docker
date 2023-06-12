@@ -107,17 +107,19 @@ class GetDailyReward:
         except genshin.GenshinException as e:
             if e.retcode != -10002:
                 console.log(f"{cookie.env_name}: {e}")
-            return info
         else:
             info.status = "✅"
 
         accounts = await client.get_game_accounts()
 
-        # 원신 계정에서 가장 레벨이 높은 지역의 계정 정보만 사용
-        account = max(
-            (acc for acc in accounts if acc.game == self.game),
-            key=lambda acc: acc.level,
-        )
+        try:
+            account = max(
+                (acc for acc in accounts if acc.game == self.game),
+                key=lambda acc: acc.level,
+            )
+        except ValueError:
+            return info
+
         _, day = await client.get_reward_info()
         if not self.rewards:
             self.rewards = await client.get_monthly_rewards()
