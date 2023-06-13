@@ -106,7 +106,8 @@ class GetDailyReward:
             info.status = "🟡"
         except genshin.GenshinException as e:
             if e.retcode != -10002:
-                console.log(f"{cookie.env_name}: {e}")
+                game = str(self.game).split(".")[-1]
+                console.log(f"\\[{game}] {cookie.env_name}: {e}")
         else:
             info.status = "✅"
 
