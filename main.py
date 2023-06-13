@@ -111,15 +111,16 @@ class GetDailyReward:
         else:
             info.status = "✅"
 
-        accounts = await client.get_game_accounts()
-
         try:
-            account = max(
-                (acc for acc in accounts if acc.game == self.game),
-                key=lambda acc: acc.level,
-            )
-        except ValueError:
+            accounts = await client.get_game_accounts()
+        except genshin.GenshinException:
             return info
+
+        accounts_game = [acc for acc in accounts if acc.game == self.game]
+        if not accounts_game:
+            return info
+
+        account = max(accounts_game, key=lambda acc: acc.level)
 
         _, day = await client.get_reward_info()
         if not self.rewards:
