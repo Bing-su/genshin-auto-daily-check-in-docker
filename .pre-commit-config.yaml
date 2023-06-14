@@ -5,26 +5,25 @@ repos:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
       - id: end-of-file-fixer
+      - id: mixed-line-ending
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.2
+    rev: v3.6.0
     hooks:
       - id: pyupgrade
-        args: [--py39-plus]
+        args: [--py310-plus]
 
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
       - id: isort
-        args: [--profile=black]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.0.272"
+    hooks:
+      - id: ruff
 
   - repo: https://github.com/psf/black
     rev: 23.3.0
     hooks:
       - id: black
-
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    # Ruff version.
-    rev: "v0.0.264"
-    hooks:
-      - id: ruff
