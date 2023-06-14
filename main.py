@@ -22,6 +22,11 @@ class CookieInfo:
     ltoken: str
     env_name: str = ""
 
+    def asdict(self) -> dict[str, str]:
+        if self.ltoken.startswith("v2"):
+            return {"ltuid_v2": self.ltuid, "ltoken_v2": self.ltoken}
+        return {"ltuid": self.ltuid, "ltoken": self.ltoken}
+
 
 @dataclass
 class RewardInfo:
@@ -93,7 +98,7 @@ class GetDailyReward:
 
     async def __call__(self, cookie: CookieInfo, server: str) -> RewardInfo:
         client = genshin.Client(lang=server, game=self.game)
-        client.set_cookies(ltuid=cookie.ltuid, ltoken=cookie.ltoken)
+        client.set_cookies(cookie.asdict())
 
         info = RewardInfo()
 

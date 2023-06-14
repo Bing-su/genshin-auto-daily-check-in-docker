@@ -16,7 +16,7 @@
 
 4. `애플리케이션(Application)` 탭으로 가서, `쿠키(Cookies)`, `https://www.hoyolab.com`을 순서대로 들어갑니다.
 
-5. 해당 탭에서 `ltuid`와 `ltoken`을 복사합니다.
+5. 해당 탭에서 `ltuid`와 `ltoken`을 복사합니다. 만약 해당 항목 대신 `ltuid_v2`와 `ltoken_v2`가 있다면 대신 이 둘을 복사합니다.
 
 ### 2. 도커 이미지 사용하기
 
