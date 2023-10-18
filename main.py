@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import asyncio
 import os
@@ -87,8 +89,7 @@ def is_there_any_success(results: list[RewardInfo]) -> bool:
 
 def censor_uid(uid: int | str) -> str:
     uid = str(uid)
-    uid = uid[:3] + "■■■■■" + uid[-1]
-    return uid
+    return uid[:3] + "■■■■■" + uid[-1]
 
 
 class GetDailyReward:
@@ -143,27 +144,37 @@ class GetDailyReward:
         return info
 
 
-async def get_all_reward(info: list[CookieInfo], server: str) -> list[GameAndReward]:
-    all_results = []
+async def get_one_game_reward(
+    info: list[CookieInfo], server: str, game: Game
+) -> list[RewardInfo]:
+    get_daily_reward = GetDailyReward(game=game)
+    funcs = (get_daily_reward(cookie=cookie, server=server) for cookie in info)
+    return await asyncio.gather(*funcs)
 
+
+async def get_all_reward(info: list[CookieInfo], server: str) -> list[GameAndReward]:
     env_and_enum = [
         ("NO_GENSHIN", Game.GENSHIN),
         ("NO_STARRAIL", Game.STARRAIL),
         ("NO_HONKAI", Game.HONKAI),
     ]
 
-    for env, game in env_and_enum:
-        if is_true(os.getenv(env, "0")):
-            continue
-        get_daily_reward = GetDailyReward(game=game)
-        funcs = (get_daily_reward(cookie=cookie, server=server) for cookie in info)
-        results = await asyncio.gather(*funcs)
+    tasks: list[asyncio.Task] = []
+    async with asyncio.TaskGroup() as tg:
+        for env, game in env_and_enum:
+            if is_true(os.getenv(env, "0")):
+                continue
+            task = tg.create_task(get_one_game_reward(info, server, game), name=env)
+            tasks.append(task)
 
+    all_results: list[list[RewardInfo]] = [task.result() for task in tasks]
+    output: list[GameAndReward] = []
+    for (env, game), results in zip(env_and_enum, all_results, strict=True):
         if is_there_any_success(results):
             game_and_reward = GameAndReward(env.removeprefix("NO_"), game, results)
-            all_results.append(game_and_reward)
+            output.append(game_and_reward)
 
-    return all_results
+    return output
 
 
 def init_table(name: str = "GENSHIN") -> Table:
