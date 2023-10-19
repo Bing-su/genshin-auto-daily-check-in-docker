@@ -169,7 +169,7 @@ async def get_all_reward(info: list[CookieInfo], server: str) -> list[GameAndRew
 
     all_results: list[list[RewardInfo]] = [task.result() for task in tasks]
     output: list[GameAndReward] = []
-    for (env, game), results in zip(env_and_enum, all_results, strict=True):
+    for (env, game), results in zip(env_and_enum, all_results, strict=False):
         if is_there_any_success(results):
             game_and_reward = GameAndReward(env.removeprefix("NO_"), game, results)
             output.append(game_and_reward)
