@@ -153,25 +153,28 @@ async def get_one_game_reward(
 
 
 async def get_all_reward(info: list[CookieInfo], server: str) -> list[GameAndReward]:
-    env_and_enum = [
-        ("NO_GENSHIN", Game.GENSHIN),
-        ("NO_STARRAIL", Game.STARRAIL),
-        ("NO_HONKAI", Game.HONKAI),
-    ]
+    mapping = {
+        "GENSHIN": Game.GENSHIN,
+        "STARRAIL": Game.STARRAIL,
+        "HONKAI": Game.HONKAI,
+    }
 
-    tasks: list[asyncio.Task] = []
+    tasks: list[asyncio.Task[list[RewardInfo]]] = []
     async with asyncio.TaskGroup() as tg:
-        for env, game in env_and_enum:
-            if is_true(os.getenv(env, "0")):
+        for name in mapping:
+            env_name = f"NO_{name}"
+            if is_true(os.getenv(env_name, "0")):
                 continue
-            task = tg.create_task(get_one_game_reward(info, server, game), name=env)
+            task = tg.create_task(
+                get_one_game_reward(info, server, mapping[name]), name=name
+            )
             tasks.append(task)
 
-    all_results: list[list[RewardInfo]] = [task.result() for task in tasks]
+    all_results = {task.get_name(): task.result() for task in tasks}
     output: list[GameAndReward] = []
-    for (env, game), results in zip(env_and_enum, all_results, strict=False):
+    for name, results in all_results.items():
         if is_there_any_success(results):
-            game_and_reward = GameAndReward(env.removeprefix("NO_"), game, results)
+            game_and_reward = GameAndReward(name, mapping[name], results)
             output.append(game_and_reward)
 
     return output
