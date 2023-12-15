@@ -119,7 +119,8 @@ class GetDailyReward:
 
         try:
             accounts = await client.get_game_accounts()
-        except genshin.GenshinException:
+        except genshin.GenshinException as e:
+            console.log(f"\\[{self.game}] {cookie.env_name}: {e}")
             return info
 
         accounts_game = [acc for acc in accounts if acc.game == self.game]
