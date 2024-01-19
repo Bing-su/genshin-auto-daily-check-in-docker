@@ -16,7 +16,7 @@
 
 4. `애플리케이션(Application)` 탭으로 가서, `쿠키(Cookies)`, `https://www.hoyolab.com`을 순서대로 들어갑니다.
 
-5. 해당 탭에서 `ltuid`와 `ltoken`을 복사합니다. 만약 해당 항목 대신 `ltuid_v2`와 `ltoken_v2`가 있다면 대신 이 둘을 복사합니다.
+5. 해당 탭에서 `ltuid`와 `ltoken`을 복사합니다. 만약 해당 항목 대신 `ltuid_v2`와 `ltoken_v2`, `ltmid_v2`가 있다면 대신 이 셋을 가져옵니다.
 
 ### 2. 도커 이미지 사용하기
 
@@ -26,14 +26,14 @@
 docker run -d \
     --restart always \
     -e ACCOUNT1=13435465,AbCdEFGhIjKLmnoPQRsTUvWxYZ \
-    -e ACCOUNT2=32132132,PQRsTUvWxYZAbCdEFGhIjKLmno \
+    -e ACCOUNT2=10203045,v2_I0STD1NliEnsF1lt4rmA9rEs6ltOkForE4chLineiFlinereTurnLetaHasHs3tLinesP1ltWh1t3sPaceF0lt9rmApXxtOlOwerc4secHarsNt=,9bcdef9cpu_py \
     -e NO_HONKAI=TRUE \
     ks2515/genshin-auto-daily-check-in
 ```
 
 `ACCOUNT`로 시작하는 모든 환경변수를 인식합니다.
 
-`,`로 ltuid와 ltoken을 구분하여 입력해주어야 합니다.
+`,`로 ltuid와 ltoken, ltmid를 구분하여 입력해주어야 합니다.
 
 ![예시 이미지](https://i.imgur.com/s8C8cJy.png)
 
