@@ -22,11 +22,15 @@ console = Console()
 class CookieInfo:
     ltuid: str
     ltoken: str
+    ltmid: str = ""
     env_name: str = ""
 
     def asdict(self) -> dict[str, str]:
         if self.ltoken.startswith("v2"):
-            return {"ltuid_v2": self.ltuid, "ltoken_v2": self.ltoken}
+            d = {"ltuid_v2": self.ltuid, "ltoken_v2": self.ltoken}
+            if self.ltmid:
+                d["ltmid_v2"] = self.ltmid
+            return d
         return {"ltuid": self.ltuid, "ltoken": self.ltoken}
 
 
@@ -90,6 +94,15 @@ def is_there_any_success(results: list[RewardInfo]) -> bool:
 def censor_uid(uid: int | str) -> str:
     uid = str(uid)
     return uid[:3] + "■■■■■" + uid[-1]
+
+
+def parse_cookie(cookie: str, env_name: str = "") -> CookieInfo | None:
+    a = [c.strip() for c in cookie.split(",")]
+    if len(a) == 2:
+        return CookieInfo(ltuid=a[0], ltoken=a[1], env_name=env_name)
+    if len(a) == 3:
+        return CookieInfo(ltuid=a[0], ltoken=a[1], ltmid=a[2], env_name=env_name)
+    return None
 
 
 class GetDailyReward:
@@ -199,10 +212,10 @@ def init_table(name: str = "GENSHIN") -> Table:
 def get_cookie_info_in_env() -> list[CookieInfo]:
     info = []
     for name, value in os.environ.items():
-        if name.startswith("ACCOUNT") and "," in value:
-            ltuid, ltoken = map(str.strip, value.split(",", maxsplit=1))
-            cookie = CookieInfo(ltuid, ltoken, name)
-            info.append(cookie)
+        if name.startswith("ACCOUNT"):
+            cookie = parse_cookie(value, name)
+            if cookie:
+                info.append(cookie)
     info.sort(key=lambda cookie: cookie.env_name)
     return info
 
