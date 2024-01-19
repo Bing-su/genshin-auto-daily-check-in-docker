@@ -13,7 +13,6 @@ schedule = "*"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
-isort = "*"
 ruff = "*"
 python-dotenv = "*"
 pre-commit = "*"
