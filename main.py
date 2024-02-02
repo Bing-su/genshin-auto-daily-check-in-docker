@@ -93,7 +93,7 @@ def is_there_any_success(results: list[RewardInfo]) -> bool:
 
 def censor_uid(uid: int | str) -> str:
     uid = str(uid)
-    return uid[:3] + "■■■■■" + uid[-1]
+    return uid[:-6] + "■■■■■" + uid[-1]
 
 
 def parse_cookie(cookie: str, env_name: str = "") -> CookieInfo | None:
@@ -119,7 +119,9 @@ class GetDailyReward:
         try:
             await client.claim_daily_reward(reward=False)
         except genshin.InvalidCookies:
-            console.log(f"{cookie.env_name}: 쿠키 정보가 잘못되었습니다. ltuid와 ltoken을 확인해주세요.")
+            console.log(
+                f"{cookie.env_name}: 쿠키 정보가 잘못되었습니다. ltuid와 ltoken을 확인해주세요."
+            )
             return info
         except genshin.AlreadyClaimed:
             info.status = "🟡"
