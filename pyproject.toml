@@ -16,15 +16,13 @@ black = "*"
 ruff = "*"
 python-dotenv = "*"
 pre-commit = "*"
+taskipy = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.isort]
-profile = "black"
-
-[tool.ruff]
+[tool.ruff.lint]
 select = [
     "A",
     "B",
@@ -51,3 +49,7 @@ select = [
 ]
 ignore = ["B008", "B905", "E501"]
 unfixable = ["F401"]
+
+[tool.taskipy.tasks.docker]
+cmd = "docker build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in ."
+help = "Build docker image. Requires containerd image store."
