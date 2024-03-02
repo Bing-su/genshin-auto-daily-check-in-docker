@@ -5,6 +5,7 @@ import asyncio
 import os
 import sys
 import time
+from contextlib import suppress
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -275,12 +276,10 @@ if __name__ == "__main__":
     fix_asyncio_windows_error()
     args = parse_args()
 
-    try:
+    with suppress(Exception):
         from dotenv import load_dotenv
 
         load_dotenv()
-    except ImportError:
-        pass
 
     if args.once:
         main()
