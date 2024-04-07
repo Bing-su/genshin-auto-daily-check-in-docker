@@ -1,0 +1,11 @@
+services:
+  genshin-auto-daily-check-in:
+    image: ks2515/genshin-auto-daily-check-in
+    restart: always
+    environment:
+      ACCOUNT1: 13435465,AbCdEFGhIjKLmnoPQRsTUvWxYZ
+      ACCOUNT2: 10203045,v2_I0STD1NliEnsF1lt4rmA9rEs6ltOkForE4chLineiFlinereTurnLetaHasHs3tLinesP1ltWh1t3sPaceF0lt9rmApXxtOlOwerc4secHarsNt=,9bcdef9cpu_py
+      MAX_PARALLEL: "10"
+      NO_HONKAI: "TRUE"
+      TIME: "01:00"
+      TZ: Asia/Seoul
