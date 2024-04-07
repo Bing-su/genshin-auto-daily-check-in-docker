@@ -265,7 +265,7 @@ def main() -> None:
 
     server = os.getenv("SERVER", "ko-kr")
     server = check_server(server)
-    max_parallel = int(os.getenv("MAX_PARALLEL", "10"))
+    max_parallel = int(os.getenv("MAX_PARALLEL", "-1"))
     results = asyncio.run(
         get_all_reward(info=cookies, server=server, max_parallel=max_parallel)
     )
