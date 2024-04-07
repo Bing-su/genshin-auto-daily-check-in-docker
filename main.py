@@ -5,7 +5,8 @@ import asyncio
 import os
 import sys
 import time
-from contextlib import suppress
+from asyncio import Semaphore
+from contextlib import nullcontext, suppress
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -107,11 +108,16 @@ def parse_cookie(cookie: str, env_name: str = "") -> CookieInfo | None:
 
 
 class GetDailyReward:
-    def __init__(self, game: Game = Game.GENSHIN):
+    def __init__(self, game: Game = Game.GENSHIN, semaphore: Semaphore | None = None):
         self.rewards = []
         self.game = game
+        self.semaphore = semaphore if semaphore is not None else nullcontext()
 
     async def __call__(self, cookie: CookieInfo, server: str) -> RewardInfo:
+        async with self.semaphore:
+            return await self._call(cookie=cookie, server=server)
+
+    async def _call(self, cookie: CookieInfo, server: str) -> RewardInfo:
         client = genshin.Client(lang=server, game=self.game)
         client.set_cookies(cookie.asdict())
 
@@ -162,19 +168,28 @@ class GetDailyReward:
 
 
 async def get_one_game_reward(
-    info: list[CookieInfo], server: str, game: Game
+    info: list[CookieInfo],
+    server: str,
+    game: Game,
+    semaphore: Semaphore | None = None,
 ) -> list[RewardInfo]:
-    get_daily_reward = GetDailyReward(game=game)
+    get_daily_reward = GetDailyReward(game=game, semaphore=semaphore)
     funcs = (get_daily_reward(cookie=cookie, server=server) for cookie in info)
     return await asyncio.gather(*funcs)
 
 
-async def get_all_reward(info: list[CookieInfo], server: str) -> list[GameAndReward]:
+async def get_all_reward(
+    info: list[CookieInfo],
+    server: str,
+    max_parallel: int = 10,
+) -> list[GameAndReward]:
+
     mapping = {
         "GENSHIN": Game.GENSHIN,
         "STARRAIL": Game.STARRAIL,
         "HONKAI": Game.HONKAI,
     }
+    semaphore = Semaphore(max_parallel) if max_parallel > 0 else None
 
     tasks: list[asyncio.Task[list[RewardInfo]]] = []
     async with asyncio.TaskGroup() as tg:
@@ -182,9 +197,14 @@ async def get_all_reward(info: list[CookieInfo], server: str) -> list[GameAndRew
             env_name = f"NO_{name}"
             if is_true(os.getenv(env_name, "0")):
                 continue
-            task = tg.create_task(
-                get_one_game_reward(info, server, mapping[name]), name=name
+
+            func = get_one_game_reward(
+                info=info,
+                server=server,
+                game=mapping[name],
+                semaphore=semaphore,
             )
+            task = tg.create_task(func, name=name)
             tasks.append(task)
 
     all_results = {task.get_name(): task.result() for task in tasks}
@@ -219,6 +239,7 @@ def get_cookie_info_in_env() -> list[CookieInfo]:
             cookie = parse_cookie(value, name)
             if cookie:
                 info.append(cookie)
+
     info.sort(key=lambda cookie: cookie.env_name)
     return info
 
@@ -244,7 +265,10 @@ def main() -> None:
 
     server = os.getenv("SERVER", "ko-kr")
     server = check_server(server)
-    results = asyncio.run(get_all_reward(cookies, server))
+    max_parallel = int(os.getenv("MAX_PARALLEL", "10"))
+    results = asyncio.run(
+        get_all_reward(info=cookies, server=server, max_parallel=max_parallel)
+    )
 
     if not results:
         return
