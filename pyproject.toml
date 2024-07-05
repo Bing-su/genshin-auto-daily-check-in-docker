@@ -7,12 +7,11 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-genshin = "^1.6.0"
+genshin = { url = "https://github.com/thesadru/genshin.py/archive/4f1b2ebc5cdea62f65f9348b8fc79d6d12099d18.zip" }
 rich = "*"
 schedule = "*"
 
 [tool.poetry.group.dev.dependencies]
-black = "*"
 ruff = "*"
 python-dotenv = "*"
 pre-commit = "*"
@@ -47,7 +46,7 @@ select = [
     "UP",
     "W",
 ]
-ignore = ["B008", "B905", "E501"]
+ignore = ["B905", "E501"]
 unfixable = ["F401"]
 
 [tool.taskipy.tasks.docker]
