@@ -1,6 +1,6 @@
 FROM python:3.12-alpine
 
-RUN apk add --no-cache tzdata
+RUN apk add -U --no-cache tzdata
 
 ENV TZ="Asia/Shanghai"
 
