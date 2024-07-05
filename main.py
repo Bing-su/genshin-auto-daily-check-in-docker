@@ -183,11 +183,11 @@ async def get_all_reward(
     server: str,
     max_parallel: int = 10,
 ) -> list[GameAndReward]:
-
     mapping = {
         "GENSHIN": Game.GENSHIN,
         "STARRAIL": Game.STARRAIL,
         "HONKAI": Game.HONKAI,
+        "ZZZ": Game.ZZZ,
     }
     semaphore = Semaphore(max_parallel) if max_parallel > 0 else None
 
