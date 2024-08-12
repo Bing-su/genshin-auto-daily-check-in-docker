@@ -6,10 +6,8 @@ ENV TZ="Asia/Shanghai"
 
 WORKDIR /app
 
-COPY requirements.txt /app
+COPY requirements.lock main.py /app/
 
-RUN pip install -U --no-cache-dir --require-hashes -r requirements.txt
-
-COPY . .
+RUN PYTHONDONTWRITEBYTECODE=1 pip install -U --no-cache-dir --require-hashes -r requirements.lock
 
 CMD ["python", "main.py"]
