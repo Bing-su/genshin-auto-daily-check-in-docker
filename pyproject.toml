@@ -1,25 +1,25 @@
-[tool.poetry]
-name = "genshin-auto-daily-check-in-docker"
+[project]
+name = "genshin-auto-daily-check-in"
 version = "1.6.0"
 description = "원신 호요랩 자동 출석체크 도커 이미지. 여러 계정을 한번에 등록할 수 있습니다."
-authors = ["Bingsu <ks2515@naver.com>"]
-license = "MIT"
+authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
+dependencies = [
+    "genshin @ https://github.com/thesadru/genshin.py/archive/f6bd51bf23611ba0f38d98f89a73538d03b695a9.zip",
+    "rich",
+    "schedule",
+]
+readme = "README.md"
+requires-python = ">=3.11"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-genshin = { url = "https://github.com/thesadru/genshin.py/archive/f6bd51bf23611ba0f38d98f89a73538d03b695a9.zip" }
-rich = "*"
-schedule = "*"
+[tool.rye]
+dev-dependencies = ["pre-commit", "ruff", "python-dotenv"]
+managed = true
+virtual = true
+universal = true
+generate-hashes = true
 
-[tool.poetry.group.dev.dependencies]
-ruff = "*"
-python-dotenv = "*"
-pre-commit = "*"
-taskipy = "*"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.rye.scripts]
+docker = "docker build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in ."
 
 [tool.ruff.lint]
 select = [
@@ -48,7 +48,3 @@ select = [
 ]
 ignore = ["B905", "E501"]
 unfixable = ["F401"]
-
-[tool.taskipy.tasks.docker]
-cmd = "docker build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in ."
-help = "Build docker image. Requires containerd image store."
