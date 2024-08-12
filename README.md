@@ -22,6 +22,8 @@
 
 해당 토큰은 예시입니다.
 
+ACCOUNT1=ltuid,ltoken 또는 ACCOUNT1=ltuid_v2,ltoken_v2,ltmid_v2 형식으로 입력해주세요.
+
 ```bash
 docker run -d \
     --restart always \
@@ -65,7 +67,8 @@ services:
 | NO_STARRAIL          | 스타레일 출석체크를 하지 않습니다.                                                                                                    | 1                                   |
 | NO_HONKAI            | 붕괴3rd 출석체크를 하지 않습니다.                                                                                                     | yes                                 |
 | NO_ZZZ               | 젠레스 존 제로 출석체크를 하지 않습니다.                                                                                              | yes                                 |
-| MAX_PARALLEL         | 동시에 진행할 수 있는 작업의 수 제한 (기본값 -1(무제한))<br/>계정 하나당 최대 게임 3개의 작업이 있다는걸 유의하세요.                  | 10                                  |
+| NO_TOT               | 미해결 사건부 출석체크를 하지 않습니다.                                                                                               | y                                   |
+| MAX_PARALLEL         | 동시에 진행할 수 있는 작업의 수 제한 (기본값 -1(무제한))<br/>계정 하나당 최대 게임 3개의 작업이 있다는걸 유의하세요.                  | 20                                  |
 
 ### 3. 기타
 
@@ -78,9 +81,9 @@ main.py에 -o를 붙여 실행하면 매일 반복하는 것이 아니라 한 �
 #### 빌드
 
 ```bash
-docker buildx create --name genshin-builder --use
+# https://docs.docker.com/desktop/containerd containerd image store 기능 필요
 
-docker buildx build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in --push .
+docker build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in .
 ```
 
 ## 요구사항
