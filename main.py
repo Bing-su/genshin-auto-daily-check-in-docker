@@ -291,7 +291,7 @@ def main() -> None:
     console.print(panel)
 
 
-if __name__ == "__main__":
+def entry() -> None:
     fix_asyncio_windows_error()
     args = parse_args()
 
@@ -304,11 +304,11 @@ if __name__ == "__main__":
         main()
         sys.exit(0)
 
-    TIME = os.getenv("TIME", "00:00")
+    schedule_time = os.getenv("TIME", "00:00")
     try:
-        schedule.every().day.at(TIME).do(main)
+        schedule.every().day.at(schedule_time).do(main)
     except schedule.ScheduleValueError:
-        m = f"'{TIME}'은 잘못된 시간 형식입니다. TIME을 HH:MM(:SS)형태로 입력해주십시오."
+        m = f"'{schedule_time}'은 잘못된 시간 형식입니다. TIME을 HH:MM(:SS)형태로 입력해주십시오."
         console.log(m)
         console.log("앱이 종료되었습니다.")
         sys.exit(1)
@@ -318,3 +318,7 @@ if __name__ == "__main__":
     while True:
         schedule.run_pending()
         time.sleep(1)
+
+
+if __name__ == "__main__":
+    entry()
