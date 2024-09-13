@@ -4,7 +4,7 @@ version = "1.7.0"
 description = "원신 호요랩 자동 출석체크 도커 이미지. 여러 계정을 한번에 등록할 수 있습니다."
 authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
 dependencies = [
-    "genshin @ https://github.com/thesadru/genshin.py/archive/f6bd51bf23611ba0f38d98f89a73538d03b695a9.zip",
+    "genshin @ https://github.com/thesadru/genshin.py/archive/13ab1edb490f0cb3faec12ba57f425f09eb11675.zip",
     "rich",
     "schedule",
 ]
