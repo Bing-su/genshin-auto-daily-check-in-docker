@@ -1,6 +1,6 @@
 # /// script
 # dependencies = [
-#     "genshin @ https://github.com/thesadru/genshin.py/archive/f6bd51bf23611ba0f38d98f89a73538d03b695a9.zip",
+#     "genshin>=1.7.2",
 #     "rich",
 #     "schedule",
 # ]
