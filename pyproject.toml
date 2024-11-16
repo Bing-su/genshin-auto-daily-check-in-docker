@@ -1,6 +1,6 @@
 [project]
 name = "genshin-auto-daily-check-in"
-version = "1.7.2"
+version = "1.7.3"
 description = "원신 호요랩 자동 출석체크 도커 이미지. 여러 계정을 한번에 등록할 수 있습니다."
 authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
 dependencies = ["genshin>=1.7.2", "rich", "schedule"]
@@ -8,7 +8,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [tool.rye]
-dev-dependencies = ["pre-commit", "ruff", "python-dotenv"]
+dev-dependencies = ["pre-commit-uv", "ruff", "python-dotenv"]
 managed = true
 virtual = true
 universal = true
