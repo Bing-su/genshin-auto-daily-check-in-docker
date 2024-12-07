@@ -7,15 +7,11 @@ dependencies = ["genshin>=1.7.2", "rich", "schedule"]
 readme = "README.md"
 requires-python = ">=3.11"
 
-[tool.rye]
-dev-dependencies = ["pre-commit-uv", "ruff", "python-dotenv"]
-managed = true
-virtual = true
-universal = true
-generate-hashes = true
+[dependency-groups]
+dev = ["pre-commit-uv", "ruff", "python-dotenv"]
 
-[tool.rye.scripts]
-docker = "docker build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in ."
+[tool.uv]
+package = false
 
 [tool.ruff.lint]
 select = [

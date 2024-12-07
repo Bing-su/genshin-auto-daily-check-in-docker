@@ -1,0 +1,24 @@
+# https://taskfile.dev
+
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - task --list
+    silent: true
+
+  update:
+    cmds:
+      - uv sync --all-extras --all-groups --upgrade
+    desc: Update all dependencies
+
+  export:
+    cmds:
+      - uv export -o requirements.txt --no-group dev
+    desc: Export lock file to requirements.txt
+
+  docker:
+    cmds:
+      - docker build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in .
+    desc: Build docker image
