@@ -11,6 +11,7 @@ tasks:
   update:
     cmds:
       - uv sync --all-extras --all-groups --upgrade
+      - pre-commit autoupdate --jobs 5
     desc: Update all dependencies
 
   export:
