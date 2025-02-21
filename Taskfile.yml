@@ -21,5 +21,5 @@ tasks:
 
   docker:
     cmds:
-      - docker build --platform linux/amd64,linux/arm64 --tag ks2515/genshin-auto-daily-check-in .
+      - docker buildx bake {{ .CLI_ARGS }}
     desc: Build docker image
