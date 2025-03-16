@@ -21,11 +21,13 @@ from datetime import datetime
 import genshin
 import schedule
 from genshin import Game
+from pydantic import TypeAdapter, ValidationError
 from rich.console import Console, Group
 from rich.panel import Panel
 from rich.table import Table
 
 console = Console()
+is_true_ta = TypeAdapter(bool)
 
 
 @dataclass
@@ -94,7 +96,10 @@ def check_server(server: str) -> str:
 
 
 def is_true(value: str) -> bool:
-    return value.lower() in ("true", "1", "yes", "y", "on")
+    try:
+        return is_true_ta.validate_python(value)
+    except ValidationError:
+        return False
 
 
 def is_there_any_success(results: list[RewardInfo]) -> bool:
@@ -250,6 +255,7 @@ def get_cookie_info_in_env() -> list[CookieInfo]:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--once", action="store_true", help="Run only once")
+    parser.add_argument("--on-launch", action="store_true", help="Run on launch")
     return parser.parse_args()
 
 
@@ -308,7 +314,7 @@ def entry() -> None:
 
         load_dotenv()
 
-    if args.once:
+    if args.once or is_true(os.getenv("RUN_ONCE", "0")):
         main()
         sys.exit(0)
 
@@ -322,6 +328,9 @@ def entry() -> None:
         sys.exit(1)
 
     console.log("앱이 실행되었습니다.")
+
+    if args.on_launch or is_true(os.getenv("RUN_ON_LAUNCH", "0")):
+        main()
 
     while True:
         schedule.run_pending()
