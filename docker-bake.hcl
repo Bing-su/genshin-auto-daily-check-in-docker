@@ -1,5 +1,5 @@
 variable "tag" {
-    default = "1.7.4"
+    default = "1.8.0"
 }
 
 variable "repository" {
@@ -9,5 +9,5 @@ variable "repository" {
 target "default" {
     context = "."
     platforms = ["linux/amd64", "linux/arm64"]
-    tags = ["${repository}:latest", "${repository}:${tag}"]
+    tags = ["${repository}:${tag}", "${repository}:latest"]
 }
