@@ -13,10 +13,12 @@ import asyncio
 import os
 import sys
 import time
+import tomllib
 from asyncio import Semaphore
 from contextlib import nullcontext, suppress
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 
 import genshin
 import schedule
@@ -248,7 +250,32 @@ def get_cookie_info_in_env() -> list[CookieInfo]:
             if cookie:
                 info.append(cookie)
 
-    info.sort(key=lambda cookie: cookie.env_name)
+    return info
+
+
+def get_cookie_info_from_file(file_path: str | Path) -> list[CookieInfo]:
+    with Path(file_path).open("rb") as f:
+        data = tomllib.load(f)
+
+    info = []
+    for name, value in data.items():
+        cookie = parse_cookie(value, name)
+        if cookie:
+            info.append(cookie)
+
+    return info
+
+
+def get_cookie_info(file_path: str | Path = "cookie.toml") -> list[CookieInfo]:
+    info = get_cookie_info_in_env()
+
+    if file_path and Path(file_path).is_file():
+        try:
+            info += get_cookie_info_from_file(file_path)
+        except tomllib.TOMLDecodeError as e:
+            console.log(f"{file_path}: TOML 파일을 읽는 중 오류가 발생했습니다: {e}")
+
+    info.sort(key=lambda x: x.env_name)
     return info
 
 
@@ -256,6 +283,13 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--once", action="store_true", help="Run only once")
     parser.add_argument("--on-launch", action="store_true", help="Run on launch")
+    parser.add_argument(
+        "--cookie-file",
+        type=str,
+        default="cookie.toml",
+        metavar="<file>",
+        help="Path to the cookie file (default: cookie.toml)",
+    )
     return parser.parse_args()
 
 
@@ -269,8 +303,9 @@ def fix_asyncio_windows_error() -> None:
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
-def main() -> None:
-    cookies = get_cookie_info_in_env()
+def main(args: argparse.Namespace) -> None:
+    file_path = args.cookie_file
+    cookies = get_cookie_info(file_path)
 
     server = os.getenv("SERVER", "ko-kr")
     server = check_server(server)
@@ -315,7 +350,7 @@ def entry() -> None:
         load_dotenv()
 
     if args.once or is_true(os.getenv("RUN_ONCE", "0")):
-        main()
+        main(args)
         sys.exit(0)
 
     schedule_time = os.getenv("TIME", "00:00")
@@ -330,7 +365,7 @@ def entry() -> None:
     console.log("앱이 실행되었습니다.")
 
     if args.on_launch or is_true(os.getenv("RUN_ON_LAUNCH", "0")):
-        main()
+        main(args)
 
     while True:
         schedule.run_pending()
