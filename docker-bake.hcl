@@ -1,5 +1,5 @@
 variable "TAG" {
-    default = "1.8.0"
+    default = "latest"
 }
 
 variable "REPOSITORY" {
