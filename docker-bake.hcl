@@ -1,13 +1,13 @@
-variable "tag" {
+variable "TAG" {
     default = "1.8.0"
 }
 
-variable "repository" {
+variable "REPOSITORY" {
     default = "ks2515/genshin-auto-daily-check-in"
 }
 
 target "default" {
     context = "."
     platforms = ["linux/amd64", "linux/arm64"]
-    tags = ["${repository}:${tag}", "${repository}:latest"]
+    tags = ["${REPOSITORY}:${TAG}", "${REPOSITORY}:latest"]
 }
