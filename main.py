@@ -355,7 +355,7 @@ def entry() -> None:
 
     schedule_time = os.getenv("TIME", "00:00")
     try:
-        schedule.every().day.at(schedule_time).do(main)
+        schedule.every().day.at(schedule_time).do(main, args)
     except schedule.ScheduleValueError:
         m = f"'{schedule_time}'은 잘못된 시간 형식입니다. TIME을 HH:MM(:SS)형태로 입력해주십시오."
         console.log(m)
