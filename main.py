@@ -293,16 +293,6 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def fix_asyncio_windows_error() -> None:
-    "https://github.com/encode/httpx/issues/914#issuecomment-622586610"
-    if (
-        sys.version_info[0] == 3
-        and sys.version_info[1] >= 8
-        and sys.platform.startswith("win")
-    ):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-
 def main(args: argparse.Namespace) -> None:
     file_path = args.cookie_file
     cookies = get_cookie_info(file_path)
@@ -341,7 +331,6 @@ def main(args: argparse.Namespace) -> None:
 
 
 def entry() -> None:
-    fix_asyncio_windows_error()
     args = parse_args()
 
     with suppress(Exception):
