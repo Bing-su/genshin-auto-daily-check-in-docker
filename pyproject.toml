@@ -2,41 +2,41 @@
 name = "genshin-auto-daily-check-in"
 version = "1.9.1"
 description = "원신 호요랩 자동 출석체크 도커 이미지. 여러 계정을 한번에 등록할 수 있습니다."
-authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
-dependencies = ["genshin>=1.7.2", "rich", "schedule"]
 readme = "README.md"
 requires-python = ">=3.11"
+authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
+dependencies = ["genshin>=1.7.2", "rich", "schedule"]
 
 [dependency-groups]
-dev = ["pre-commit-uv", "ruff", "python-dotenv"]
-
-[tool.uv]
-package = false
+dev = ["python-dotenv"]
 
 [tool.ruff.lint]
 select = [
-    "A",
-    "B",
-    "C4",
-    "C90",
-    "E",
-    "EM",
-    "F",
-    "FA",
-    "FURB",
-    "I001",
-    "ISC",
-    "N",
-    "PERF",
-    "PIE",
-    "PT",
-    "PTH",
-    "RET",
-    "RUF",
-    "SIM",
-    "T20",
-    "UP",
-    "W",
+  "A",
+  "B",
+  "C4",
+  "C90",
+  "E",
+  "EM",
+  "F",
+  "FA",
+  "FURB",
+  "I001",
+  "ISC",
+  "N",
+  "PERF",
+  "PIE",
+  "PT",
+  "PTH",
+  "RET",
+  "RUF",
+  "SIM",
+  "T20",
+  "UP",
+  "W",
 ]
 ignore = ["B905", "E501"]
 unfixable = ["F401"]
+
+[tool.uv]
+package = false
