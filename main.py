@@ -21,6 +21,7 @@ from datetime import datetime
 from pathlib import Path
 
 import genshin
+import httpx
 import schedule
 from genshin import Game
 from pydantic import TypeAdapter, ValidationError
@@ -279,6 +280,47 @@ def get_cookie_info(file_path: str | Path = "cookie.toml") -> list[CookieInfo]:
     return info
 
 
+async def send_discord_webhook(
+    results: list[GameAndReward], timestamp: str
+) -> None:
+    webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
+    if not webhook_url:
+        return
+
+    fields = []
+    for result in results:
+        game_results = []
+        for info in result.rewards:
+            game_results.append(
+                f"{info.status} `{info.uid}` **{info.name}** Lv.{info.level} | "
+                f"{info.server} | {info.check_in_count}일 | {info.reward}"
+            )
+
+        fields.append(
+            {
+                "name": f"🎮 {result.name}",
+                "value": "\n".join(game_results) if game_results else "결과 없음",
+                "inline": False,
+            }
+        )
+
+    embed = {
+        "title": "✅ HoYoLab 일일 출석체크 완료",
+        "color": 0x00FF00,
+        "fields": fields,
+        "footer": {"text": timestamp},
+    }
+
+    payload = {"embeds": [embed]}
+
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        try:
+            response = await client.post(webhook_url, json=payload)
+            response.raise_for_status()
+        except httpx.HTTPError as e:
+            console.log(f"Discord 웹훅 전송 실패: {e}")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--once", action="store_true", help="Run only once")
@@ -328,6 +370,9 @@ def main(args: argparse.Namespace) -> None:
 
     panel = Panel(Group(*group), title=now)
     console.print(panel)
+
+    # Send Discord webhook
+    asyncio.run(send_discord_webhook(results, now))
 
 
 def entry() -> None:

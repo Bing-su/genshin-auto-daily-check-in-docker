@@ -5,7 +5,7 @@ description = "원신 호요랩 자동 출석체크 도커 이미지. 여러 계
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
-dependencies = ["genshin>=1.7.2", "rich", "schedule"]
+dependencies = ["genshin>=1.7.2", "httpx", "rich", "schedule"]
 
 [dependency-groups]
 dev = ["python-dotenv"]
