@@ -280,12 +280,42 @@ def get_cookie_info(file_path: str | Path = "cookie.toml") -> list[CookieInfo]:
     return info
 
 
+def analyze_results(results: list[GameAndReward]) -> tuple[str, int]:
+    all_rewards = []
+    for result in results:
+        all_rewards.extend(result.rewards)
+
+    if not all_rewards:
+        return "❌ HoYoLab 일일 출석체크 실패", 0xFF0000
+
+    success_count = sum(1 for r in all_rewards if r.status == "✅")
+    already_claimed_count = sum(1 for r in all_rewards if r.status == "🟡")
+    failed_count = sum(1 for r in all_rewards if r.status == "❌")
+    total_count = len(all_rewards)
+
+    if success_count == total_count:
+        return "✅ HoYoLab 일일 출석체크 완료", 0x00FF00
+
+    if already_claimed_count == total_count:
+        return "🟡 HoYoLab 일일 출석체크 (이미 완료)", 0xFFFF00
+
+    if failed_count == total_count:
+        return "❌ HoYoLab 일일 출석체크 실패", 0xFF0000
+
+    if failed_count == 0:
+        return "✅ HoYoLab 일일 출석체크 (일부 이미 완료)", 0x00FF00
+
+    return "⚠️ HoYoLab 일일 출석체크 (일부 실패)", 0xFFA500
+
+
 async def send_discord_webhook(
     results: list[GameAndReward], timestamp: str
 ) -> None:
     webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
     if not webhook_url:
         return
+
+    title, color = analyze_results(results)
 
     fields = []
     for result in results:
@@ -305,8 +335,8 @@ async def send_discord_webhook(
         )
 
     embed = {
-        "title": "✅ HoYoLab 일일 출석체크 완료",
-        "color": 0x00FF00,
+        "title": title,
+        "color": color,
         "fields": fields,
         "footer": {"text": timestamp},
     }
