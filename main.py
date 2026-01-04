@@ -20,8 +20,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+import aiohttp
 import genshin
-import httpx
 import schedule
 from genshin import Game
 from pydantic import TypeAdapter, ValidationError
@@ -343,11 +343,12 @@ async def send_discord_webhook(
 
     payload = {"embeds": [embed]}
 
-    async with httpx.AsyncClient(timeout=10.0) as client:
+    timeout = aiohttp.ClientTimeout(total=10.0)
+    async with aiohttp.ClientSession(timeout=timeout) as session:
         try:
-            response = await client.post(webhook_url, json=payload)
-            response.raise_for_status()
-        except httpx.HTTPError as e:
+            async with session.post(webhook_url, json=payload) as response:
+                response.raise_for_status()
+        except aiohttp.ClientError as e:
             console.log(f"Discord 웹훅 전송 실패: {e}")
 
 
