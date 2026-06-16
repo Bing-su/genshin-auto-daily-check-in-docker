@@ -12,12 +12,14 @@ tasks:
     cmds:
       - uv sync --all-extras --all-groups --upgrade
       - prek auto-update
+      - task: export
     desc: Update all dependencies
 
   export:
     cmds:
-      - uv export -o requirements.txt --no-group dev
-    desc: Export lock file to requirements.txt
+      - uv export --format pylock.toml -o pylock.toml --no-group dev
+      - tombi format pylock.toml
+    desc: Export lock file to pylock.toml
 
   docker:
     cmds:

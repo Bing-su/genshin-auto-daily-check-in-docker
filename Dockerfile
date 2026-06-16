@@ -6,9 +6,9 @@ ENV TZ="Asia/Shanghai"
 
 WORKDIR /app
 
-COPY requirements.txt main.py /app/
+COPY pylock.toml main.py /app/
 
-RUN PYTHONDONTWRITEBYTECODE=1 pip install -U --no-cache-dir --require-hashes -r requirements.txt && \
+RUN PYTHONDONTWRITEBYTECODE=1 pip install -U --no-cache-dir -r pylock.toml && \
     adduser -D lumine
 
 USER lumine
